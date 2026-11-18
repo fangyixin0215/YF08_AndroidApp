@@ -22,6 +22,8 @@ import androidx.core.content.ContextCompat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -29,7 +31,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.UUID
@@ -170,7 +171,7 @@ class BleManager(private val context: Context) {
             enableNotify(g, BleProtocol.CHAR_RECORD_NOTIFY)
             _connectionState.value = ConnectionState.CONNECTED
             // 连接成功后主动拉一次 State
-            sendCommand(BleProtocol.CMD_GET_STATE, ByteArray(0))
+            scope.launch { sendCommand(BleProtocol.CMD_GET_STATE, ByteArray(0)) }
         }
 
         override fun onCharacteristicChanged(
@@ -249,7 +250,7 @@ class BleManager(private val context: Context) {
             .array()
         val key = (cmd shl 8) or (seq.toInt() and 0xFF)
         return withTimeoutOrNull(2000) {
-            kotlinx.coroutines.suspendCancellableCoroutine { cont ->
+            suspendCancellableCoroutine { cont ->
                 pending[key] = { rsp ->
                     if (cont.isActive) cont.resumeWith(Result.success(rsp))
                 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">YF08 翻转拍</string>
+    <string name="app_name">YF08_Tools</string>
     <string name="nav_control">控制</string>
     <string name="nav_records">记录</string>
     <string name="nav_ota">升级</string>

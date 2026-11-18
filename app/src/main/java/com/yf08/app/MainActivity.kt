@@ -57,13 +57,12 @@ class MainActivity : ComponentActivity() {
                     snackbarHost = { SnackbarHost(snackbarHostState) },
                     bottomBar = {
                         if (showBottomBar) {
-                            YF08BottomBar(currentRoute) { route ->
+                            YF08BottomBar(currentRoute, onNavigate = { route ->
                                 navController.navigate(route) {
-                                    popUpTo(navController.graph.startDestinationId) { saveState = true }
                                     launchSingleTop = true
                                     restoreState = true
                                 }
-                            }
+                            })
                         }
                     }
                 ) { pad ->
